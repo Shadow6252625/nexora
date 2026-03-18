@@ -1,0 +1,860 @@
+<html lang="en" class="scroll-smooth"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora | Advanced Solana Liquidity Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Glass & Blur Utilities */
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .glass-button {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #a5a5a5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-text-accent {
+            background: linear-gradient(to right, #c084fc, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); border-color: rgba(168, 85, 247, 0.6); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+
+        /* Ranges & Inputs */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            margin-top: -5px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .iconify {
+            stroke-width: 1.5px !important;
+        }
+        
+        .code-syntax-keyword { color: #c678dd; }
+        .code-syntax-string { color: #98c379; }
+        .code-syntax-func { color: #61afef; }
+        .code-syntax-plain { color: #abb2bf; }
+        
+        /* Scanline effect */
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500/30 selection:text-indigo-100">
+
+    <!-- Backgrounds (Replaced with Nebula Shader) -->
+    <div id="canvas-container" class="fixed inset-0 z-0 pointer-events-none"></div>
+    <!-- Overlay to fade background into black at bottom for readability -->
+    <div class="fixed inset-0 z-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none opacity-80"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 w-full border-b border-white/5 backdrop-blur-xl bg-black/60">
+        <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10 group overflow-hidden">
+                    <div class="absolute inset-0 bg-indigo-500/20 blur-md group-hover:bg-indigo-500/40 transition-all"></div>
+                    <img src="assets/nexus-logo.svg" alt="Nexora" class="relative z-10 w-7 h-7 rounded-md" />
+                </div>
+                <span class="text-sm font-medium tracking-tight text-white">NEXORA</span>
+                <div class="hidden lg:flex items-center gap-2 px-2 py-0.5 rounded-full border border-white/5 bg-white/5 ml-4">
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[10px] font-mono text-neutral-400">TPS: 4,291</span>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-xs font-medium text-neutral-400">
+                <a href="markets.html" class="hover:text-white transition-colors">Markets</a>
+                <a href="https://x.com/nexus_protocolx" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors" aria-label="X" title="X">
+                    <span class="iconify inline-block align-middle" data-icon="simple-icons:x" data-width="14"></span>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-2 text-[10px] font-mono text-neutral-500 border-r border-white/10 pr-4">
+                    <span class="iconify" data-icon="lucide:fuel" data-width="12"></span>
+                    <span>0.000005 SOL</span>
+                </div>
+                <a href="dashboard.html" class="glass-button px-4 py-1.5 rounded-md text-xs font-medium text-white hover:bg-white/5 transition-all flex items-center gap-2 group">
+                    <span>Launch Nexora Terminal</span>
+                    <span class="w-2 h-2 rounded-full bg-neutral-600 group-hover:bg-indigo-500 transition-colors"></span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow z-10 relative">
+        
+        <!-- Hero Section -->
+        <section class="pt-24 pb-16 md:pt-32 md:pb-24 px-6 relative overflow-hidden">
+            <!-- Removed the previous blurred blob to let the nebula show through -->
+            
+            <div class="max-w-5xl mx-auto text-center space-y-8 relative z-10">
+                <div class="inline-flex items-center gap-3 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-200 text-xs font-medium mb-4 animate-fade-in backdrop-blur-md">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    <span>Neural Liquidity Engine V2 Live</span>
+                    <span class="w-px h-3 bg-indigo-500/30 mx-1"></span>
+                    <span class="text-indigo-400/80 hover:text-white cursor-pointer transition-colors flex items-center gap-1">Read Change Log <span class="iconify" data-icon="lucide:arrow-right" data-width="10"></span></span>
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-white leading-[1] animate-fade-in text-shadow-sm">
+                    Instant liquidity for <br>
+                    <span class="gradient-text-accent">illiquid assets.</span>
+                </h1>
+                
+                <p class="text-base md:text-lg text-neutral-300 max-w-xl mx-auto leading-relaxed animate-fade-in font-light drop-shadow-md">
+                    Nexora powers the first intelligent on-chain order book for fractionalized assets — delivering near-zero slippage execution through adaptive valuation models.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 animate-fade-in">
+                    <a href="markets.html" class="bg-white text-black px-8 py-3 rounded-full text-sm font-semibold hover:bg-neutral-200 transition-all w-full sm:w-auto shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center gap-2">Explore Liquidity<span class="iconify" data-icon="lucide:arrow-right" data-width="16"></span>
+                    </a>
+                    <a href="docs.html" class="glass-button px-8 py-3 rounded-full text-sm font-medium text-neutral-300 hover:text-white transition-colors w-full sm:w-auto flex items-center justify-center gap-2 group backdrop-blur-md">
+                        <span class="iconify group-hover:text-indigo-400 transition-colors" data-icon="lucide:file-text" data-width="16"></span>
+                        Documentation
+                    </a>
+                </div>
+
+                <!-- Ticker -->
+                <div class="pt-12 flex justify-center">
+                    <div class="inline-flex items-center gap-8 px-8 py-3 rounded-full border border-white/5 bg-black/40 backdrop-blur-md shadow-2xl">
+                        <div class="flex flex-col text-left">
+                            <span class="text-[10px] uppercase text-neutral-500 tracking-wider font-semibold">Total Vol</span>
+                            <span class="text-sm font-mono text-white">$482,192,041</span>
+                        </div>
+                        <div class="w-px h-8 bg-white/10"></div>
+                        <div class="flex flex-col text-left">
+                            <span class="text-[10px] uppercase text-neutral-500 tracking-wider font-semibold">Floor Index</span>
+                            <span class="text-sm font-mono text-emerald-400 flex items-center gap-1">
+                                +4.2% <span class="iconify" data-icon="lucide:trending-up" data-width="12"></span>
+                            </span>
+                        </div>
+                        <div class="w-px h-8 bg-white/10"></div>
+                        <div class="flex flex-col text-left">
+                            <span class="text-[10px] uppercase text-neutral-500 tracking-wider font-semibold">Active Pools</span>
+                            <span class="text-sm font-mono text-white">12,402</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Interface Section -->
+        <section id="terminal" class="px-4 pb-24 relative z-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-sm font-medium text-white flex items-center gap-2">
+                        <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+                        Live Terminal
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="text-[10px] text-neutral-500 font-mono border border-white/10 px-2 py-1 rounded bg-black/50 backdrop-blur-md">MAINNET-BETA</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl border border-white/10 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
+                    <!-- Scanline Overlay -->
+                    <div class="scanline z-10"></div>
+
+                    <!-- Sidebar / Asset Selector -->
+                    <div class="lg:col-span-3 border-r border-white/10 bg-black/60 flex flex-col h-[600px]">
+                        <div class="p-4 border-b border-white/10 bg-white/5">
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-neutral-500"><span class="iconify" data-icon="lucide:search" data-width="14"></span></span>
+                                <input type="text" placeholder="Search collection..." class="w-full bg-black/50 border border-white/10 rounded-md py-2 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-indigo-500/50 transition-colors placeholder:text-neutral-600">
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar">
+                            <!-- List Item 1 -->
+                            <div class="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-indigo-900/20 border border-indigo-500/30 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&amp;w=100&amp;auto=format&amp;fit=crop" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <span class="text-xs font-medium text-white group-hover:text-indigo-300">Cyber Samuels</span>
+                                            <span class="text-[10px] text-emerald-400 font-mono">+12%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[10px] text-neutral-500">Floor: 42.5 SOL</span>
+                                            <span class="text-[10px] text-neutral-600">Vol: 1.2K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- List Item 2 -->
+                            <div class="p-3 border-b border-white/5 bg-indigo-500/10 border-l-2 border-l-indigo-500">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-neutral-900 border border-white/10 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?q=80&amp;w=100&amp;auto=format&amp;fit=crop" class="w-full h-full object-cover opacity-80">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <span class="text-xs font-medium text-white">Mad Lads</span>
+                                            <span class="text-[10px] text-emerald-400 font-mono">+2.4%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[10px] text-neutral-500">Floor: 145.2 SOL</span>
+                                            <span class="text-[10px] text-neutral-600">Vol: 54K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- List Item 3 -->
+                            <div class="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-neutral-900 border border-white/10 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&amp;w=100&amp;auto=format&amp;fit=crop" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <span class="text-xs font-medium text-white">DeGods</span>
+                                            <span class="text-[10px] text-red-400 font-mono">-0.8%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[10px] text-neutral-500">Floor: 33.1 SOL</span>
+                                            <span class="text-[10px] text-neutral-600">Vol: 12K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center: Chart & Depth -->
+                    <div class="lg:col-span-6 bg-black/40 flex flex-col h-[600px]">
+                        <!-- Chart Header -->
+                        <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <h3 class="text-xs font-bold text-white">MAD LADS / SOL</h3>
+                                <div class="flex gap-1">
+                                    <button class="px-2 py-0.5 rounded text-[10px] bg-white/10 text-white">15m</button>
+                                    <button class="px-2 py-0.5 rounded text-[10px] text-neutral-500 hover:text-white transition-colors">1H</button>
+                                    <button class="px-2 py-0.5 rounded text-[10px] text-neutral-500 hover:text-white transition-colors">4H</button>
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-emerald-400 font-mono">Live</div>
+                        </div>
+                        
+                        <!-- Mock Chart Area -->
+                        <div class="flex-1 relative border-b border-white/10 p-4">
+                            <!-- Grid lines -->
+                            <div class="absolute inset-0 grid grid-rows-4 grid-cols-4 pointer-events-none">
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5"></div>
+                            </div>
+                            
+                            <!-- SVG Chart Path -->
+                            <svg class="w-full h-full" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:rgba(99, 102, 241, 0.5);stop-opacity:1"></stop>
+                                        <stop offset="100%" style="stop-color:rgba(99, 102, 241, 0);stop-opacity:0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0 200 C 100 180, 200 250, 300 150 S 500 100, 600 80 S 800 120, 1000 50 L 1000 400 L 0 400 Z" fill="url(#gradient)"></path>
+                                <path d="M0 200 C 100 180, 200 250, 300 150 S 500 100, 600 80 S 800 120, 1000 50" stroke="#6366f1" stroke-width="2" fill="none" vector-effect="non-scaling-stroke"></path>
+                            </svg>
+
+                            <!-- Current Price Tag -->
+                            <div class="absolute top-[10%] right-0 bg-indigo-500 text-white text-[10px] px-2 py-0.5 font-mono rounded-l">145.20</div>
+                        </div>
+
+                        <!-- Order Book / Recent Trades Split -->
+                        <div class="h-48 grid grid-cols-2 divide-x divide-white/10">
+                            <div class="p-3">
+                                <h4 class="text-[10px] text-neutral-500 uppercase font-semibold mb-2">Order Book</h4>
+                                <div class="space-y-1 font-mono text-[10px]">
+                                    <div class="flex justify-between text-red-400 opacity-60"><span class="opacity-50">146.50</span> <span>0.42</span></div>
+                                    <div class="flex justify-between text-red-400 opacity-80"><span class="opacity-50">146.20</span> <span>1.20</span></div>
+                                    <div class="flex justify-between text-red-400"><span class="opacity-50">146.00</span> <span>5.50</span></div>
+                                    <div class="my-1 border-t border-white/5"></div>
+                                    <div class="flex justify-between text-emerald-400"><span class="opacity-50">145.20</span> <span>2.10</span></div>
+                                    <div class="flex justify-between text-emerald-400 opacity-80"><span class="opacity-50">145.00</span> <span>10.5</span></div>
+                                    <div class="flex justify-between text-emerald-400 opacity-60"><span class="opacity-50">144.80</span> <span>8.20</span></div>
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <h4 class="text-[10px] text-neutral-500 uppercase font-semibold mb-2">Recent Trades</h4>
+                                <div class="space-y-1 font-mono text-[10px]">
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:02:21</span>
+                                        <span class="text-emerald-400">Buy</span>
+                                        <span>145.20</span>
+                                    </div>
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:02:18</span>
+                                        <span class="text-red-400">Sell</span>
+                                        <span>145.15</span>
+                                    </div>
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:02:05</span>
+                                        <span class="text-red-400">Sell</span>
+                                        <span>145.15</span>
+                                    </div>
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:01:55</span>
+                                        <span class="text-emerald-400">Buy</span>
+                                        <span>145.18</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Execution -->
+                    <div class="lg:col-span-3 border-l border-white/10 bg-neutral-900/60 flex flex-col h-[600px] p-6 relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none"></div>
+                        
+                        <div class="mb-6">
+                            <div class="flex gap-1 p-1 bg-black/40 rounded-lg border border-white/10 mb-6">
+                                <button class="flex-1 py-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors">Swap</button>
+                                <button class="flex-1 py-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors">Pool</button>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] text-neutral-500 uppercase font-semibold">Input Asset</label>
+                                    <div class="p-3 bg-black/40 border border-white/10 rounded-lg flex justify-between items-center group hover:border-indigo-500/50 transition-colors cursor-pointer">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded bg-neutral-800 flex items-center justify-center text-xs">NFT</span>
+                                            <span class="text-sm font-medium text-white">MadLads #8241</span>
+                                        </div>
+                                        <span class="iconify text-neutral-500 group-hover:text-white" data-icon="lucide:chevron-down" data-width="14"></span>
+                                    </div>
+                                    <div class="text-[10px] text-right text-neutral-500">Est. Value: 145.2 SOL</div>
+                                </div>
+
+                                <div class="flex justify-center -my-2 relative z-10">
+                                    <div class="w-8 h-8 rounded-full bg-neutral-900 border border-white/10 flex items-center justify-center text-neutral-400">
+                                        <span class="iconify" data-icon="lucide:arrow-down" data-width="14"></span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-[10px] text-neutral-500 uppercase font-semibold">Output</label>
+                                    <div class="p-3 bg-black/40 border border-white/10 rounded-lg flex justify-between items-center">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[8px] font-bold text-white">NXS</span>
+                                            <span class="text-sm font-medium text-white">1,000,000</span>
+                                        </div>
+                                        <span class="text-xs text-neutral-400">Tokens</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings -->
+                        <div class="flex-1">
+                            <h4 class="text-[10px] text-neutral-500 uppercase font-semibold mb-3">Parameters</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-neutral-400">Slippage Tolerance</span>
+                                    <span class="text-xs text-indigo-400">0.5%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-neutral-400">Protocol Fee</span>
+                                    <span class="text-xs text-white">0.3%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-neutral-400">Royalty (Enforced)</span>
+                                    <span class="text-xs text-white">5.0%</span>
+                                </div>
+                                
+                                <div class="pt-2">
+                                    <div class="flex justify-between text-[10px] mb-1">
+                                        <span class="text-neutral-500">Bonding Curve Progress</span>
+                                        <span class="text-white">12%</span>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-[12%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="w-full bg-white text-black py-3 rounded-lg text-sm font-bold mt-auto hover:bg-indigo-50 hover:text-indigo-900 transition-colors shadow-lg shadow-indigo-500/10 flex justify-center items-center gap-2">
+                            <span class="iconify" data-icon="lucide:zap" data-width="16"></span>
+                            Execute Transmutation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Feed Section -->
+        <section id="activity-feed" class="py-12 border-y border-white/5 bg-black/60 backdrop-blur-sm relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="flex h-3 w-3 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <h3 class="text-sm font-medium text-white uppercase tracking-widest">Global Activity Feed</h3>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] uppercase text-neutral-500 border-b border-white/10">
+                                <th class="pb-4 font-medium pl-4">Time</th>
+                                <th class="pb-4 font-medium">Type</th>
+                                <th class="pb-4 font-medium">Asset</th>
+                                <th class="pb-4 font-medium">Valuation</th>
+                                <th class="pb-4 font-medium text-right pr-4">Tx Hash</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs font-mono text-neutral-300">
+                            <!-- Row 1 -->
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td class="py-3 pl-4 text-neutral-500">10s ago</td>
+                                <td class="py-3"><span class="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-[10px] border border-indigo-500/20">LIQUIDATE</span></td>
+                                <td class="py-3 flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded-full bg-purple-500"></div>
+                                    <span>Mad Lads #2910</span>
+                                </td>
+                                <td class="py-3">142.5 SOL</td>
+                                <td class="py-3 text-right pr-4"><a href="#" class="text-indigo-400 hover:text-white transition-colors">8x91...2k9</a></td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td class="py-3 pl-4 text-neutral-500">42s ago</td>
+                                <td class="py-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] border border-emerald-500/20">BUYBACK</span></td>
+                                <td class="py-3 flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                                    <span>Okay Bear #112</span>
+                                </td>
+                                <td class="py-3">22.1 SOL</td>
+                                <td class="py-3 text-right pr-4"><a href="#" class="text-indigo-400 hover:text-white transition-colors">3j12...aa1</a></td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td class="py-3 pl-4 text-neutral-500">1m ago</td>
+                                <td class="py-3"><span class="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-[10px] border border-indigo-500/20">LIQUIDATE</span></td>
+                                <td class="py-3 flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded-full bg-orange-500"></div>
+                                    <span>Claynosaur #881</span>
+                                </td>
+                                <td class="py-3">34.8 SOL</td>
+                                <td class="py-3 text-right pr-4"><a href="#" class="text-indigo-400 hover:text-white transition-colors">9k11...pp0</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Developer Section -->
+        <section id="composability" class="py-24 px-6 relative">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                
+                <!-- Text Content -->
+                <div class="space-y-8">
+                    <h2 class="text-3xl md:text-4xl font-medium text-white tracking-tight">
+                        Built for <br><span class="text-neutral-500">composability.</span>
+                    </h2>
+                    <p class="text-neutral-400 leading-relaxed">
+                        Integrate Nexora appraisal oracles and liquidity pools directly into your dApp. Our execution engine handles the complexity of adaptive valuation models and bonding curve management.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 p-2 bg-indigo-500/10 rounded-lg text-indigo-400 border border-indigo-500/20">
+                                <span class="iconify" data-icon="lucide:box" data-width="20"></span>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-medium mb-1">Standardized Tokens</h3>
+                                <p class="text-sm text-neutral-500">Output tokens are standard SPL tokens, compatible with all Solana DeFi protocols (Jupiter, Kamino, MarginFi).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 p-2 bg-indigo-500/10 rounded-lg text-indigo-400 border border-indigo-500/20">
+                                <span class="iconify" data-icon="lucide:key" data-width="20"></span>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-medium mb-1">Permissionless SDK</h3>
+                                <p class="text-sm text-neutral-500">Full TypeScript support with comprehensive documentation and examples.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 pt-4">
+                        <button class="text-white text-sm font-medium border-b border-white hover:border-indigo-400 hover:text-indigo-400 transition-colors pb-0.5">View API Reference</button>
+                        <button class="text-neutral-500 text-sm font-medium hover:text-white transition-colors flex items-center gap-1">
+                            <span class="iconify" data-icon="lucide:github" data-width="14"></span> Nexora-SDK
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Code Block -->
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl opacity-20 blur transition duration-500 group-hover:opacity-40"></div>
+                    <div class="relative bg-[#0A0A0A] border border-white/10 rounded-xl p-6 font-mono text-xs overflow-hidden shadow-2xl">
+                        <div class="flex items-center gap-2 mb-4 border-b border-white/5 pb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                            <div class="ml-auto text-neutral-600">index.ts</div>
+                        </div>
+                        <div class="overflow-x-auto">
+<pre class="leading-relaxed"><span class="code-syntax-keyword">import</span> { NexoraClient, Network } <span class="code-syntax-keyword">from</span> <span class="code-syntax-string">'@nexus-labs/sdk'</span>;
+
+<span class="code-syntax-plain">// Initialize Client</span>
+<span class="code-syntax-keyword">const</span> nexus = <span class="code-syntax-keyword">new</span> <span class="code-syntax-func">NexoraClient</span>({
+  <span class="code-syntax-plain">network:</span> Network.Mainnet,
+  <span class="code-syntax-plain">rpc:</span> <span class="code-syntax-string">'https://api.mainnet-beta.solana.com'</span>
+});
+
+<span class="code-syntax-plain">// Appraise and Transmute</span>
+<span class="code-syntax-keyword">async function</span> <span class="code-syntax-func">liquidateAsset</span>(mintAddress) {
+  <span class="code-syntax-keyword">const</span> valuation = <span class="code-syntax-keyword">await</span> nexus.oracle.<span class="code-syntax-func">getValuation</span>(mintAddress);
+  
+  <span class="code-syntax-keyword">console</span>.<span class="code-syntax-func">log</span>(<span class="code-syntax-string">`Fair Value: ${valuation.price} SOL`</span>);
+  
+  <span class="code-syntax-keyword">const</span> tx = <span class="code-syntax-keyword">await</span> nexus.liquidity.<span class="code-syntax-func">createPool</span>({
+    <span class="code-syntax-plain">mint:</span> mintAddress,
+    <span class="code-syntax-plain">curve:</span> <span class="code-syntax-string">'exponential'</span>,
+    <span class="code-syntax-plain">instantLiquidity:</span> <span class="code-syntax-keyword">true</span>
+  });
+  
+  <span class="code-syntax-keyword">return</span> tx.signature;
+}
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Grid -->
+        <section class="py-16 px-6 border-t border-white/5 bg-black/60">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="flex flex-col items-center justify-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+                        <span class="iconify w-8 h-8" data-icon="simple-icons:solana"></span>
+                        <span class="text-xs font-semibold">SOLANA</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+                        <span class="iconify w-8 h-8" data-icon="simple-icons:chainlink"></span>
+                        <span class="text-xs font-semibold">CHAINLINK</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+                        <span class="iconify w-8 h-8" data-icon="simple-icons:vercel"></span>
+                        <span class="text-xs font-semibold">VERCEL</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+                        <span class="iconify w-8 h-8" data-icon="simple-icons:auth0"></span>
+                        <span class="text-xs font-semibold">CERTIK</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA / Footer -->
+        <footer class="border-t border-white/5 bg-[#050505] pt-20 pb-12 px-6 relative overflow-hidden">
+            <!-- Glow -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50 blur-sm"></div>
+
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-12 mb-16">
+                <div class="max-w-xs">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="assets/nexus-logo.svg" alt="Nexora" class="w-6 h-6 rounded-md" />
+                        <span class="text-lg font-bold text-white tracking-tight">NEXORA</span>
+                    </div>
+                    <p class="text-sm text-neutral-500 mb-6">
+                        The intelligent protocol for on-chain assets. <br>
+                        High-efficiency execution via adaptive valuation systems.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="p-2 rounded-full bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors">
+                            <span class="iconify" data-icon="lucide:twitter" data-width="16"></span>
+                        </a>
+                        <a href="#" class="p-2 rounded-full bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors">
+                            <span class="iconify" data-icon="lucide:github" data-width="16"></span>
+                        </a>
+                        <a href="#" class="p-2 rounded-full bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors">
+                            <span class="iconify" data-icon="lucide:message-circle" data-width="16"></span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-12 text-sm">
+                    <div>
+                        <h4 class="font-medium text-white mb-4">Protocol</h4>
+                        <ul class="space-y-3 text-neutral-500">
+                            <li><a href="#" class="hover:text-white transition-colors">Markets</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Pools</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Bonding Curves</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Tokenomics</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-white mb-4">Developers</h4>
+                        <ul class="space-y-3 text-neutral-500">
+                            <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">JavaScript SDK</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Rust Crate</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Audits</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-white mb-4">Support</h4>
+                        <ul class="space-y-3 text-neutral-500">
+                            <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Bug Bounty</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-white/5">
+                <span class="text-xs text-neutral-600">© 2026 Nexora Labs, Inc. All rights reserved.</span>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-xs text-neutral-500">All Systems Operational</span>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // Three.js Shader Setup - Nebula Star Nest
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Star Nest Fragment Shader
+        const fragmentShader = `
+            uniform vec2 iResolution;
+            uniform float iTime;
+            uniform vec2 iMouse;
+
+            // Star Nest parameters
+            #define iterations 17
+            #define formuparam 0.53
+            #define volsteps 20
+            #define stepsize 0.1
+            #define zoom   0.800
+            #define tile   0.850
+            #define speed  0.005 
+            #define brightness 0.0015
+            #define darkmatter 0.300
+            #define distfading 0.730
+            #define saturation 0.850
+
+            void mainImage( out vec4 fragColor, in vec2 fragCoord )
+            {
+                // 1. Generate Space Content (Star Nest)
+                vec2 uv = fragCoord.xy / iResolution.xy - 0.5;
+                uv.y *= iResolution.y / iResolution.x;
+                vec3 dir = vec3(uv * zoom, 1.0);
+                float time = iTime * speed + 0.25;
+
+                // Mouse interaction for rotation
+                float a1 = 0.5 + iMouse.x / iResolution.x * 2.0;
+                float a2 = 0.8 + iMouse.y / iResolution.y * 2.0;
+                mat2 rot1 = mat2(cos(a1), sin(a1), -sin(a1), cos(a1));
+                mat2 rot2 = mat2(cos(a2), sin(a2), -sin(a2), cos(a2));
+                dir.xz *= rot1;
+                dir.xy *= rot2;
+                
+                vec3 from = vec3(1.0, 0.5, 0.5);
+                from += vec3(time * 2.0, time, -2.0);
+                from.xz *= rot1;
+                from.xy *= rot2;
+                
+                // Volumetric rendering
+                float s = 0.1, fade = 1.0;
+                vec3 v = vec3(0.0);
+                for (int r = 0; r < volsteps; r++) {
+                    vec3 p = from + s * dir * 0.5;
+                    p = abs(vec3(tile) - mod(p, vec3(tile * 2.0)));
+                    float pa, a = pa = 0.0;
+                    for (int i = 0; i < iterations; i++) { 
+                        p = abs(p) / dot(p, p) - formuparam;
+                        a += abs(length(p) - pa);
+                        pa = length(p);
+                    }
+                    float dm = max(0.0, darkmatter - a * a * 0.001);
+                    a *= a * a;
+                    if (r > 6) fade *= 1.0 - dm;
+                    v += fade;
+                    v += vec3(s, s * s, s * s * s * s) * a * brightness * fade;
+                    fade *= distfading;
+                    s += stepsize;
+                }
+                
+                vec3 starColor = mix(vec3(length(v)), v, saturation) * 0.01;
+                
+                // 2. Apply User Requested Color Grading / Post Processing
+                vec3 bloom = starColor * 0.5;
+                vec3 tint = vec3(1.0, 0.9, 0.8);
+                vec3 finalCol = starColor + bloom * tint * 0.3;
+
+                // ACES Tonemapping
+                finalCol *= 0.9;
+                float a_val = 2.51;
+                float b_val = 0.03;
+                float c_val = 2.43;
+                float d_val = 0.59;
+                float e_val = 0.14;
+                finalCol = clamp((finalCol * (a_val * finalCol + b_val)) / (finalCol * (c_val * finalCol + d_val) + e_val), 0.0, 1.0);
+                
+                // Gamma correction
+                finalCol = pow(finalCol, vec3(1.0 / 2.2));
+                
+                // Vignette
+                vec2 q = fragCoord.xy / iResolution.xy;
+                float vign = 1.0 - length((q - 0.5) * 1.5);
+                finalCol *= clamp(vign + 0.3, 0.0, 1.0);
+
+                fragColor = vec4(finalCol, 1.0);
+            }
+
+            void main() {
+                mainImage(gl_FragColor, gl_FragCoord.xy);
+            }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                iTime: { value: 0 },
+                iResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                iMouse: { value: new THREE.Vector2(0, 0) }
+            },
+            fragmentShader: fragmentShader,
+            vertexShader: `
+                void main() {
+                    gl_Position = vec4( position, 1.0 );
+                }
+            `
+        });
+
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+        scene.add(plane);
+
+        // Mouse interaction
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            material.uniforms.iMouse.value.x = mouseX;
+            material.uniforms.iMouse.value.y = window.innerHeight - mouseY;
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            material.uniforms.iTime.value = clock.getElapsedTime();
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+
+</body></html>
+
+

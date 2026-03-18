@@ -1,0 +1,1003 @@
+<html lang="en" class="scroll-smooth"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexora | Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background-color: #030303;
+color: #e5e5e5;
+overflow: hidden;
+margin: 0;
+padding: 0;
+}
+canvas { display: block; width: 100vw; height: 100vh; }
+.font-mono {
+font-family: 'JetBrains Mono', monospace;
+}
+/* Subtle Glass Utilities */
+.glass-panel {
+background: rgba(15, 15, 15, 0.7);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.glass-card {
+background: linear-gradient(180deg, rgba(20, 20, 20, 0.9) 0%, rgba(10, 10, 10, 0.9) 100%);
+border: 1px solid rgba(255, 255, 255, 0.05);
+transition: all 0.3s ease;
+}
+.glass-card:hover {
+border-color: rgba(255, 255, 255, 0.1);
+background: linear-gradient(180deg, rgba(25, 25, 25, 0.9) 0%, rgba(15, 15, 15, 0.9) 100%);
+transform: translateY(-2px);
+}
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+width: 4px;
+height: 4px;
+}
+::-webkit-scrollbar-track {
+background: #050505;
+}
+::-webkit-scrollbar-thumb {
+background: #222;
+border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #333;
+}
+.iconify {
+stroke-width: 1.5px !important;
+}
+/* Table Styles */
+tr:last-child td {
+border-bottom: none;
+}
+.sidebar-icon-active {
+background-color: rgba(255,255,255,0.1);
+color: white !important;
+border-left: 2px solid white;
+}
+/* Gradient Text */
+.text-gradient {
+background: linear-gradient(to right, #ffffff, #a5a5a5);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+/* Tab Animations */
+.tab-btn {
+position: relative;
+transition: all 0.2s ease;
+}
+.tab-btn.active {
+color: #818cf8; /* indigo-400 */
+background-color: rgba(99, 102, 241, 0.1);
+border-color: rgba(99, 102, 241, 0.2);
+}
+/* Live Price Animations */
+@keyframes flashGreen {
+0% { color: #34d399; text-shadow: 0 0 5px rgba(52, 211, 153, 0.5); }
+100% { color: inherit; text-shadow: none; }
+}
+@keyframes flashRed {
+0% { color: #f87171; text-shadow: 0 0 5px rgba(248, 113, 113, 0.5); }
+100% { color: inherit; text-shadow: none; }
+}
+.price-up {
+animation: flashGreen 1s ease-out;
+color: #34d399 !important;
+}
+.price-down {
+animation: flashRed 1s ease-out;
+color: #f87171 !important;
+}
+.hidden-section {
+display: none;
+}
+</style><link id="all-fonts-link-font-geist" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist">.font-geist { font-family: 'Geist', sans-serif !important; }</style><link id="all-fonts-link-font-roboto" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-roboto">.font-roboto { font-family: 'Roboto', sans-serif !important; }</style><link id="all-fonts-link-font-montserrat" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-montserrat">.font-montserrat { font-family: 'Montserrat', sans-serif !important; }</style><link id="all-fonts-link-font-poppins" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-poppins">.font-poppins { font-family: 'Poppins', sans-serif !important; }</style><link id="all-fonts-link-font-playfair" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap"><style id="all-fonts-style-font-playfair">.font-playfair { font-family: 'Playfair Display', serif !important; }</style><link id="all-fonts-link-font-instrument-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-instrument-serif">.font-instrument-serif { font-family: 'Instrument Serif', serif !important; }</style><link id="all-fonts-link-font-merriweather" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap"><style id="all-fonts-style-font-merriweather">.font-merriweather { font-family: 'Merriweather', serif !important; }</style><link id="all-fonts-link-font-bricolage" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-bricolage">.font-bricolage { font-family: 'Bricolage Grotesque', sans-serif !important; }</style><link id="all-fonts-link-font-jakarta" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-jakarta">.font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif !important; }</style><link id="all-fonts-link-font-manrope" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-manrope">.font-manrope { font-family: 'Manrope', sans-serif !important; }</style><link id="all-fonts-link-font-space-grotesk" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-space-grotesk">.font-space-grotesk { font-family: 'Space Grotesk', sans-serif !important; }</style><link id="all-fonts-link-font-work-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-work-sans">.font-work-sans { font-family: 'Work Sans', sans-serif !important; }</style><link id="all-fonts-link-font-pt-serif" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-pt-serif">.font-pt-serif { font-family: 'PT Serif', serif !important; }</style><link id="all-fonts-link-font-geist-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-geist-mono">.font-geist-mono { font-family: 'Geist Mono', monospace !important; }</style><link id="all-fonts-link-font-space-mono" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap"><style id="all-fonts-style-font-space-mono">.font-space-mono { font-family: 'Space Mono', monospace !important; }</style><link id="all-fonts-link-font-quicksand" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-quicksand">.font-quicksand { font-family: 'Quicksand', sans-serif !important; }</style><link id="all-fonts-link-font-nunito" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap"><style id="all-fonts-style-font-nunito">.font-nunito { font-family: 'Nunito', sans-serif !important; }</style><link id="all-fonts-link-font-newsreader" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..800&amp;display=swap"><style id="all-fonts-style-font-newsreader">.font-newsreader { font-family: 'Newsreader', serif !important; }</style><link id="all-fonts-link-font-google-sans-flex" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-google-sans-flex">.font-google-sans-flex { font-family: 'Google Sans Flex', sans-serif !important; }</style><link id="all-fonts-link-font-oswald" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-oswald">.font-oswald { font-family: 'Oswald', sans-serif !important; }</style><link id="all-fonts-link-font-dm-sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;display=swap"><style id="all-fonts-style-font-dm-sans">.font-dm-sans { font-family: 'DM Sans', sans-serif !important; }</style></head>
+<body class="min-h-screen flex text-sm antialiased selection:bg-indigo-500/30 selection:text-indigo-100">
+
+    <!-- Background (Interactive Starfield) -->
+    <div id="canvas-container" class="fixed inset-0 z-0 bg-black"></div>
+    <!-- Optional: Subtle Vignette Overlay for depth -->
+    <div class="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
+
+    <!-- Layout Wrapper -->
+    <div class="relative z-10 flex w-full h-screen overflow-hidden">
+        
+        <!-- Left Sidebar -->
+        <aside class="w-16 lg:w-20 border-r border-white/5 flex flex-col items-center py-6 bg-black/40 backdrop-blur-xl shrink-0 z-50">
+            <!-- Logo -->
+            <a href="index.html" class="mb-8 p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 cursor-pointer" title="Back to Home">
+                <img src="assets/nexus-logo.svg" alt="Nexora" class="w-6 h-6 rounded-md" />
+            </a>
+
+            <!-- Nav Icons -->
+            <nav class="flex flex-col gap-6 w-full items-center" id="sidebar-nav">
+                <button onclick="switchSection('marketplace', this)" class="w-full flex justify-center py-3 text-neutral-500 hover:text-white transition-colors relative group" title="Marketplace">
+                    <span class="iconify" data-icon="lucide:compass" data-width="20"></span>
+                </button>
+                <button onclick="switchSection('analytics', this)" class="w-full flex justify-center py-3 text-white sidebar-icon-active relative transition-all duration-200" title="Dashboard">
+                    <span class="iconify group-hover:scale-110 transition-transform" data-icon="lucide:layout-dashboard" data-width="20"></span>
+                </button>
+                
+                <button onclick="switchSection('wallet', this)" class="w-full flex justify-center py-3 text-neutral-500 hover:text-white transition-colors relative group" title="Wallet">
+                    <span class="iconify group-hover:scale-110 transition-transform" data-icon="lucide:wallet" data-width="20"></span>
+                </button>
+                <button onclick="switchSection('calendar', this)" class="w-full flex justify-center py-3 text-neutral-500 hover:text-white transition-colors relative group" title="Launchpad">
+                    <span class="iconify group-hover:scale-110 transition-transform" data-icon="lucide:calendar" data-width="20"></span>
+                </button>
+                <div class="w-8 h-px bg-white/10 my-1"></div>
+                <button onclick="switchSection('settings', this)" class="w-full flex justify-center py-3 text-neutral-500 hover:text-white transition-colors relative group" title="Settings">
+                    <span class="iconify group-hover:scale-110 transition-transform" data-icon="lucide:settings" data-width="20"></span>
+                </button>
+            </nav>
+
+            <!-- Bottom Actions -->
+            <div class="mt-auto flex flex-col gap-6 w-full items-center">
+                
+                
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-w-0 bg-black/40">
+            
+            <!-- Top Header -->
+            <header class="h-16 border-b border-white/5 flex items-center justify-between px-6 lg:px-8 bg-black/20 backdrop-blur-md sticky top-0 z-40">
+                <div class="flex-1 max-w-xl">
+                    <div class="relative group">
+                        <span class="absolute left-3 top-2.5 text-neutral-500 group-focus-within:text-indigo-400 transition-colors">
+                            <span class="iconify" data-icon="lucide:search" data-width="16"></span>
+                        </span>
+                        <input type="text" placeholder="Search by project, collection, or token address" class="w-full bg-[#0F0F0F] border border-white/10 rounded-lg py-2 pl-10 pr-10 text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-indigo-500/30 focus:bg-white/5 transition-all">
+                        <div class="absolute right-2 top-2 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-neutral-500 font-mono">/</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pl-4">
+                    <div id="live-status" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] text-emerald-400 font-medium">Live Feed</span>
+                    </div>
+                    <button class="p-2 rounded-lg border border-white/10 bg-[#0F0F0F] text-neutral-400 hover:text-white hover:border-white/20 transition-colors">
+                        <span class="iconify" data-icon="lucide:globe" data-width="16"></span>
+                    </button>
+                    <button class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                        <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Container -->
+            <div class="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8 relative">
+
+<!-- VIEW: DASHBOARD (Default) -->
+<div id="view-dashboard" class="view-section space-y-8 animate-in fade-in duration-500">
+    <!-- Wallet Section -->
+    <div id="view-wallet" class="view-section space-y-6 animate-in fade-in duration-500">
+                    <div class="glass-card rounded-xl p-8 bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-white/10">
+                        <div class="text-neutral-400 text-sm mb-1">Total Balance</div>
+                        <div class="text-4xl font-semibold text-white tracking-tight">$124,592.34</div>
+                        <div class="flex gap-4 mt-6">
+                            <button class="bg-white text-black px-6 py-2 rounded-lg font-medium text-xs hover:bg-neutral-200 transition-colors">Deposit</button>
+                            <button class="bg-white/10 text-white border border-white/10 px-6 py-2 rounded-lg font-medium text-xs hover:bg-white/20 transition-colors">Withdraw</button>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-xl overflow-hidden border border-white/5">
+                        <div class="p-4 border-b border-white/5 font-medium text-white">Assets</div>
+                        <div class="p-4 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold text-xs">₿</div>
+                                    <div>
+                                        <div class="text-white text-sm">Bitcoin</div>
+                                        <div class="text-neutral-500 text-xs">0.45 BTC</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-white text-sm">$40,175.10</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-500/20 flex items-center justify-center text-slate-400 font-bold text-xs">Ξ</div>
+                                    <div>
+                                        <div class="text-white text-sm">Ethereum</div>
+                                        <div class="text-neutral-500 text-xs">12.2 ETH</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-white text-sm">$37,191.94</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+    
+    <!-- Analytics Section -->
+    <div id="view-analytics" class="view-section space-y-6 animate-in fade-in duration-500">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-medium text-white">Analytics Dashboard</h2>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 rounded-md bg-white/5 text-xs text-neutral-400 border border-white/10">BTC/USD</span>
+                            <span class="px-3 py-1 rounded-md bg-indigo-500/20 text-xs text-indigo-400 border border-indigo-500/30">1H</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 glass-panel border border-white/5 rounded-xl h-96 p-4 flex flex-col">
+                            <div class="flex justify-between mb-4">
+                                <div class="text-white text-lg font-medium">$89,278.00 <span class="text-sm text-emerald-400 ml-2">+1.2%</span></div>
+                                <div class="text-xs text-neutral-500">24h Volume: 32.4B</div>
+                            </div>
+                            <div class="flex-1 w-full bg-gradient-to-b from-emerald-500/5 to-transparent rounded-lg border border-white/5 relative overflow-hidden flex items-end justify-center">
+                                <!-- Mock Chart Bars -->
+                                <div class="flex items-end gap-1 h-full w-full px-4 pb-2 justify-between opacity-50">
+                                    <div class="w-full bg-emerald-500/20 hover:bg-emerald-500/40 transition-colors h-[40%] rounded-sm"></div>
+                                    <div class="w-full bg-emerald-500/30 hover:bg-emerald-500/50 transition-colors h-[60%] rounded-sm"></div>
+                                    <div class="w-full bg-red-500/20 hover:bg-red-500/40 transition-colors h-[30%] rounded-sm"></div>
+                                    <div class="w-full bg-emerald-500/20 hover:bg-emerald-500/40 transition-colors h-[50%] rounded-sm"></div>
+                                    <div class="w-full bg-emerald-500/40 hover:bg-emerald-500/60 transition-colors h-[80%] rounded-sm"></div>
+                                    <div class="w-full bg-red-500/30 hover:bg-red-500/50 transition-colors h-[45%] rounded-sm"></div>
+                                    <div class="w-full bg-emerald-500/50 hover:bg-emerald-500/70 transition-colors h-[90%] rounded-sm"></div>
+                                </div>
+                                <div class="absolute top-1/2 left-0 w-full h-px bg-white/5 border-t border-dashed border-white/10"></div>
+                            </div>
+                        </div>
+                        <div class="glass-panel border border-white/5 rounded-xl h-96 p-4 flex flex-col">
+                            <h3 class="text-sm font-medium text-neutral-400 mb-4 uppercase tracking-wider">Order Book</h3>
+                            <div class="flex-1 overflow-y-auto space-y-1">
+                                <div class="flex justify-between text-xs text-red-400"><span class="opacity-70">89,280.50</span> <span>0.4234</span></div>
+                                <div class="flex justify-between text-xs text-red-400"><span class="opacity-70">89,279.00</span> <span>1.2001</span></div>
+                                <div class="flex justify-between text-xs text-red-400"><span class="opacity-70">89,278.80</span> <span>0.0500</span></div>
+                                <div class="my-2 border-t border-white/5"></div>
+                                <div class="flex justify-between text-lg text-white font-medium my-2 text-center w-full block">89,278.00</div>
+                                <div class="my-2 border-t border-white/5"></div>
+                                <div class="flex justify-between text-xs text-emerald-400"><span class="opacity-70">89,277.50</span> <span>2.1000</span></div>
+                                <div class="flex justify-between text-xs text-emerald-400"><span class="opacity-70">89,276.10</span> <span>0.8540</span></div>
+                                <div class="flex justify-between text-xs text-emerald-400"><span class="opacity-70">89,275.00</span> <span>5.0021</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+    <!-- Live Terminal Section -->
+    <section id="terminal" class="px-4 pb-24 relative z-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h2 class="text-sm font-medium text-white flex items-center gap-2">
+                        <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+                        Live Terminal
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="text-[10px] text-neutral-500 font-mono border border-white/10 px-2 py-1 rounded bg-black/50 backdrop-blur-md">MAINNET-BETA</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl border border-white/10 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
+                    <!-- Scanline Overlay -->
+                    <div class="scanline z-10"></div>
+
+                    <!-- Sidebar / Asset Selector -->
+                    <div class="lg:col-span-3 border-r border-white/10 bg-black/60 flex flex-col h-[600px]">
+                        <div class="p-4 border-b border-white/10 bg-white/5">
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-neutral-500"><span class="iconify" data-icon="lucide:search" data-width="14"></span></span>
+                                <input type="text" placeholder="Search collection..." class="w-full bg-black/50 border border-white/10 rounded-md py-2 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-indigo-500/50 transition-colors placeholder:text-neutral-600">
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar">
+                            <!-- List Item 1 -->
+                            <div class="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-indigo-900/20 border border-indigo-500/30 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&amp;w=100&amp;auto=format&amp;fit=crop" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <span class="text-xs font-medium text-white group-hover:text-indigo-300">Cyber Samuels</span>
+                                            <span class="text-[10px] text-emerald-400 font-mono">+12%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[10px] text-neutral-500">Floor: 42.5 SOL</span>
+                                            <span class="text-[10px] text-neutral-600">Vol: 1.2K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- List Item 2 -->
+                            <div class="p-3 border-b border-white/5 bg-indigo-500/10 border-l-2 border-l-indigo-500">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-neutral-900 border border-white/10 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?q=80&amp;w=100&amp;auto=format&amp;fit=crop" class="w-full h-full object-cover opacity-80">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <span class="text-xs font-medium text-white">Mad Lads</span>
+                                            <span class="text-[10px] text-emerald-400 font-mono">+2.4%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[10px] text-neutral-500">Floor: 145.2 SOL</span>
+                                            <span class="text-[10px] text-neutral-600">Vol: 54K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- List Item 3 -->
+                            <div class="p-3 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-neutral-900 border border-white/10 overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&amp;w=100&amp;auto=format&amp;fit=crop" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <span class="text-xs font-medium text-white">DeGods</span>
+                                            <span class="text-[10px] text-red-400 font-mono">-0.8%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-[10px] text-neutral-500">Floor: 33.1 SOL</span>
+                                            <span class="text-[10px] text-neutral-600">Vol: 12K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center: Chart & Depth -->
+                    <div class="lg:col-span-6 bg-black/40 flex flex-col h-[600px]">
+                        <!-- Chart Header -->
+                        <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <h3 class="text-xs font-bold text-white">MAD LADS / SOL</h3>
+                                <div class="flex gap-1">
+                                    <button class="px-2 py-0.5 rounded text-[10px] bg-white/10 text-white">15m</button>
+                                    <button class="px-2 py-0.5 rounded text-[10px] text-neutral-500 hover:text-white transition-colors">1H</button>
+                                    <button class="px-2 py-0.5 rounded text-[10px] text-neutral-500 hover:text-white transition-colors">4H</button>
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-emerald-400 font-mono">Live</div>
+                        </div>
+                        
+                        <!-- Mock Chart Area -->
+                        <div class="flex-1 relative border-b border-white/10 p-4">
+                            <!-- Grid lines -->
+                            <div class="absolute inset-0 grid grid-rows-4 grid-cols-4 pointer-events-none">
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5 border-r border-white/5"></div>
+                                <div class="border-b border-white/5"></div>
+                            </div>
+                            
+                            <!-- SVG Chart Path -->
+                            <svg class="w-full h-full" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:rgba(99, 102, 241, 0.5);stop-opacity:1"></stop>
+                                        <stop offset="100%" style="stop-color:rgba(99, 102, 241, 0);stop-opacity:0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0 200 C 100 180, 200 250, 300 150 S 500 100, 600 80 S 800 120, 1000 50 L 1000 400 L 0 400 Z" fill="url(#gradient)"></path>
+                                <path d="M0 200 C 100 180, 200 250, 300 150 S 500 100, 600 80 S 800 120, 1000 50" stroke="#6366f1" stroke-width="2" fill="none" vector-effect="non-scaling-stroke"></path>
+                            </svg>
+
+                            <!-- Current Price Tag -->
+                            <div class="absolute top-[10%] right-0 bg-indigo-500 text-white text-[10px] px-2 py-0.5 font-mono rounded-l">145.20</div>
+                        </div>
+
+                        <!-- Order Book / Recent Trades Split -->
+                        <div class="h-48 grid grid-cols-2 divide-x divide-white/10">
+                            <div class="p-3">
+                                <h4 class="text-[10px] text-neutral-500 uppercase font-semibold mb-2">Order Book</h4>
+                                <div class="space-y-1 font-mono text-[10px]">
+                                    <div class="flex justify-between text-red-400 opacity-60"><span class="opacity-50">146.50</span> <span>0.42</span></div>
+                                    <div class="flex justify-between text-red-400 opacity-80"><span class="opacity-50">146.20</span> <span>1.20</span></div>
+                                    <div class="flex justify-between text-red-400"><span class="opacity-50">146.00</span> <span>5.50</span></div>
+                                    <div class="my-1 border-t border-white/5"></div>
+                                    <div class="flex justify-between text-emerald-400"><span class="opacity-50">145.20</span> <span>2.10</span></div>
+                                    <div class="flex justify-between text-emerald-400 opacity-80"><span class="opacity-50">145.00</span> <span>10.5</span></div>
+                                    <div class="flex justify-between text-emerald-400 opacity-60"><span class="opacity-50">144.80</span> <span>8.20</span></div>
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <h4 class="text-[10px] text-neutral-500 uppercase font-semibold mb-2">Recent Trades</h4>
+                                <div class="space-y-1 font-mono text-[10px]">
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:02:21</span>
+                                        <span class="text-emerald-400">Buy</span>
+                                        <span>145.20</span>
+                                    </div>
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:02:18</span>
+                                        <span class="text-red-400">Sell</span>
+                                        <span>145.15</span>
+                                    </div>
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:02:05</span>
+                                        <span class="text-red-400">Sell</span>
+                                        <span>145.15</span>
+                                    </div>
+                                    <div class="flex justify-between text-neutral-400">
+                                        <span class="text-white">14:01:55</span>
+                                        <span class="text-emerald-400">Buy</span>
+                                        <span>145.18</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Execution -->
+                    <div class="lg:col-span-3 border-l border-white/10 bg-neutral-900/60 flex flex-col h-[600px] p-6 relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none"></div>
+                        
+                        <div class="mb-6">
+                            <div class="flex gap-1 p-1 bg-black/40 rounded-lg border border-white/10 mb-6">
+                                <button class="flex-1 py-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors">Swap</button>
+                                <button class="flex-1 py-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors">Pool</button>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] text-neutral-500 uppercase font-semibold">Input Asset</label>
+                                    <div class="p-3 bg-black/40 border border-white/10 rounded-lg flex justify-between items-center group hover:border-indigo-500/50 transition-colors cursor-pointer">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded bg-neutral-800 flex items-center justify-center text-xs">NFT</span>
+                                            <span class="text-sm font-medium text-white">MadLads #8241</span>
+                                        </div>
+                                        <span class="iconify text-neutral-500 group-hover:text-white" data-icon="lucide:chevron-down" data-width="14"></span>
+                                    </div>
+                                    <div class="text-[10px] text-right text-neutral-500">Est. Value: 145.2 SOL</div>
+                                </div>
+
+                                <div class="flex justify-center -my-2 relative z-10">
+                                    <div class="w-8 h-8 rounded-full bg-neutral-900 border border-white/10 flex items-center justify-center text-neutral-400">
+                                        <span class="iconify" data-icon="lucide:arrow-down" data-width="14"></span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-[10px] text-neutral-500 uppercase font-semibold">Output</label>
+                                    <div class="p-3 bg-black/40 border border-white/10 rounded-lg flex justify-between items-center">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-[8px] font-bold text-white">NXS</span>
+                                            <span class="text-sm font-medium text-white">1,000,000</span>
+                                        </div>
+                                        <span class="text-xs text-neutral-400">Tokens</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings -->
+                        <div class="flex-1">
+                            <h4 class="text-[10px] text-neutral-500 uppercase font-semibold mb-3">Parameters</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-neutral-400">Slippage Tolerance</span>
+                                    <span class="text-xs text-indigo-400">0.5%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-neutral-400">Protocol Fee</span>
+                                    <span class="text-xs text-white">0.3%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-neutral-400">Royalty (Enforced)</span>
+                                    <span class="text-xs text-white">5.0%</span>
+                                </div>
+                                
+                                <div class="pt-2">
+                                    <div class="flex justify-between text-[10px] mb-1">
+                                        <span class="text-neutral-500">Bonding Curve Progress</span>
+                                        <span class="text-white">12%</span>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-[12%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="w-full bg-white text-black py-3 rounded-lg text-sm font-bold mt-auto hover:bg-indigo-50 hover:text-indigo-900 transition-colors shadow-lg shadow-indigo-500/10 flex justify-center items-center gap-2">
+                            <span class="iconify" data-icon="lucide:zap" data-width="16"></span>
+                            Execute Transmutation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+</div>
+
+<!-- Footer / Security Insights (Fixed at bottom of content area) -->
+                <div class="border-t border-white/5 pt-6 pb-2 mt-8">
+                     <div class="flex items-center justify-between">
+                         <h3 class="text-lg font-medium text-white">Security Insights</h3>
+                         <div class="flex gap-2">
+                             <button class="p-1.5 rounded-md border border-white/10 text-neutral-400 hover:text-white transition-colors">
+                                 <span class="iconify" data-icon="lucide:refresh-cw" data-width="14"></span>
+                             </button>
+                             <button class="flex items-center gap-1 px-3 py-1.5 rounded-md border border-white/10 text-xs text-neutral-400 hover:text-white transition-colors">
+                                 View All <span class="iconify" data-icon="lucide:arrow-right" data-width="12"></span>
+                             </button>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- View Switching Logic ---
+        function switchSection(viewId, btnElement) {
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.add('hidden-section');
+            });
+            // Show selected section
+            const target = document.getElementById('view-' + viewId);
+            if(target) target.classList.remove('hidden-section');
+
+            // Reset Sidebar Icons
+            const navButtons = document.getElementById('sidebar-nav').querySelectorAll('button');
+            navButtons.forEach(btn => {
+                btn.classList.remove('sidebar-icon-active');
+                btn.classList.add('text-neutral-500');
+                btn.classList.remove('text-white');
+            });
+
+            // Activate clicked button (if provided)
+            if(btnElement) {
+                btnElement.classList.add('sidebar-icon-active');
+                btnElement.classList.add('text-white');
+                btnElement.classList.remove('text-neutral-500');
+            }
+        }
+
+        // --- Data & Table Logic (Preserved) ---
+        let currentTab = 'trending';
+        let marketData = [];
+        let displayedData = [];
+        let isLoading = true;
+
+        const formatCurrency = (value) => {
+            if (!value) return "$0.00";
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: value < 1 ? 4 : 2,
+                maximumFractionDigits: value < 1 ? 6 : 2
+            }).format(value);
+        };
+
+        const formatCompactNumber = (number) => {
+            if (!number) return "0";
+            return new Intl.NumberFormat('en-US', {
+                notation: 'compact',
+                maximumFractionDigits: 2
+            }).format(number);
+        };
+
+        const generateSparklinePath = (data, width = 100, height = 24) => {
+            if (!data || data.length === 0) return "";
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const range = max - min;
+            if (range === 0) return `M0,${height/2} L${width},${height/2}`;
+
+            const stepX = width / (data.length - 1);
+            let path = `M0,${height - ((data[0] - min) / range * height)}`;
+
+            for (let i = 1; i < data.length; i++) {
+                const x = i * stepX;
+                const y = height - ((data[i] - min) / range * height);
+                path += ` L${x},${y}`;
+            }
+            return path;
+        };
+
+        const fallbackData = [
+            { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', current_price: 86421.00, price_change_percentage_24h: 2.4, market_cap: 1700000000000, total_volume: 45000000000, sparkline_in_7d: { price: [82000,83000,81000,84000,85000,84000,86421] }, image: "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png" },
+            { id: 'ethereum', symbol: 'eth', name: 'Ethereum', current_price: 3120.50, price_change_percentage_24h: -1.2, market_cap: 350000000000, total_volume: 15000000000, sparkline_in_7d: { price: [3000,3100,3200,3150,3100,3050,3120] }, image: "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png" },
+            { id: 'solana', symbol: 'sol', name: 'Solana', current_price: 145.20, price_change_percentage_24h: 5.6, market_cap: 65000000000, total_volume: 3000000000, sparkline_in_7d: { price: [130,135,140,138,142,148,145] }, image: "https://coin-images.coingecko.com/coins/images/4128/large/solana.png" },
+            { id: 'ripple', symbol: 'xrp', name: 'XRP', current_price: 0.62, price_change_percentage_24h: 0.5, market_cap: 34000000000, total_volume: 1000000000, sparkline_in_7d: { price: [0.60,0.61,0.60,0.62,0.63,0.61,0.62] }, image: "https://coin-images.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png" },
+            { id: 'binancecoin', symbol: 'bnb', name: 'BNB', current_price: 590.10, price_change_percentage_24h: -0.8, market_cap: 87000000000, total_volume: 800000000, sparkline_in_7d: { price: [580,585,590,595,590,585,590] }, image: "https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png" },
+        ];
+
+        async function fetchData() {
+            isLoading = true;
+            if(marketData.length === 0) renderLoadingState();
+            
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=true&price_change_percentage=24h');
+                if (!response.ok) throw new Error("API Limit");
+                const newData = await response.json();
+                marketData = newData;
+            } catch (error) {
+                console.log("Using fallback data due to API limit/error");
+                if(marketData.length === 0) marketData = fallbackData;
+            } finally {
+                isLoading = false;
+                updateUI();
+            }
+        }
+
+        function startLiveSimulation() {
+            setInterval(() => {
+                if (marketData.length === 0) return;
+                marketData.forEach(coin => {
+                    if(Math.random() > 0.7) {
+                        const originalPrice = coin.current_price;
+                        const drift = (Math.random() - 0.5) * 0.002; 
+                        const newPrice = originalPrice * (1 + drift);
+                        coin.current_price = newPrice;
+                        updateCoinDOM(coin.id, newPrice, originalPrice);
+                    }
+                });
+            }, 2000);
+        }
+
+        function updateCoinDOM(coinId, newPrice, oldPrice) {
+            const priceEl = document.getElementById(`price-${coinId}`);
+            const cardPriceEl = document.getElementById(`card-price-${coinId}`);
+            const isUp = newPrice > oldPrice;
+            const animationClass = isUp ? 'price-up' : 'price-down';
+            const formattedPrice = formatCurrency(newPrice);
+
+            if (priceEl) {
+                priceEl.innerText = formattedPrice;
+                priceEl.classList.remove('price-up', 'price-down', 'text-emerald-400', 'text-red-400', 'text-white');
+                void priceEl.offsetWidth;
+                priceEl.classList.add(animationClass);
+                setTimeout(() => { priceEl.classList.remove(animationClass); priceEl.classList.add('text-white'); }, 1000);
+            }
+            if (cardPriceEl) {
+                cardPriceEl.innerText = formattedPrice;
+                cardPriceEl.classList.remove('price-up', 'price-down', 'text-white');
+                void cardPriceEl.offsetWidth;
+                cardPriceEl.classList.add(animationClass);
+                setTimeout(() => { cardPriceEl.classList.remove(animationClass); cardPriceEl.classList.add('text-white'); }, 1000);
+            }
+        }
+
+        function getFilteredData() {
+            let data = [...marketData];
+            switch(currentTab) {
+                case 'trending': return data.slice(0, 10);
+                case 'gainers': return data.filter(c => c.price_change_percentage_24h > 0).sort((a,b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 10);
+                case 'decliners': return data.filter(c => c.price_change_percentage_24h < 0).sort((a,b) => a.price_change_percentage_24h - b.price_change_percentage_24h).slice(0, 10);
+                case 'new': return data.slice(5, 15); 
+                default: return data.slice(0, 10);
+            }
+        }
+
+        function renderLoadingState() {
+            document.getElementById('crypto-table-body').innerHTML = `
+                 <tr class="animate-pulse border-b border-white/5"><td colspan="7" class="py-8 text-center text-neutral-600">Loading live prices...</td></tr>
+            `;
+        }
+
+        function updateUI() {
+            displayedData = getFilteredData();
+            renderCards();
+            renderTable();
+        }
+
+        function renderCards() {
+            const topItems = displayedData.slice(0, 5);
+            const container = document.getElementById('top-cards-container');
+            container.innerHTML = topItems.map((item, index) => {
+                const isPositive = item.price_change_percentage_24h >= 0;
+                const colorClass = isPositive ? 'text-emerald-400' : 'text-red-400';
+                const trendIcon = isPositive ? 'lucide:trending-up' : 'lucide:trending-down';
+                const strokeColor = isPositive ? '#34d399' : '#f87171';
+                const hiddenClass = index === 3 ? 'hidden lg:block' : (index === 4 ? 'hidden xl:block' : '');
+                const chartPath = generateSparklinePath(item.sparkline_in_7d.price, 100, 40);
+
+                return `
+                <div class="glass-card rounded-xl p-4 relative group cursor-pointer overflow-hidden ${hiddenClass}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" loading="lazy">
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-neutral-500 font-medium uppercase">Rank #${item.market_cap_rank || index + 1}</div>
+                                <div class="text-sm text-white font-medium truncate max-w-[80px]">${item.name} <span class="text-neutral-500">[${item.symbol.toUpperCase()}]</span></div>
+                            </div>
+                        </div>
+                        <div class="w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-neutral-500 group-hover:border-white/30 group-hover:text-white transition-colors">
+                            <span class="iconify" data-icon="lucide:arrow-up-right" data-width="12"></span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <div class="text-xs text-neutral-500 mb-0.5">Price</div>
+                            <div id="card-price-${item.id}" class="text-xl font-medium text-white tracking-tight transition-colors duration-300">${formatCurrency(item.current_price)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs ${colorClass} flex items-center justify-end gap-0.5">
+                                <span class="iconify" data-icon="${trendIcon}" data-width="12"></span> ${Math.abs(item.price_change_percentage_24h).toFixed(2)}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-10 w-full mt-2 opacity-50">
+                        <svg viewBox="0 0 100 40" class="w-full h-full fill-none" preserveAspectRatio="none">
+                            <path d="${chartPath}" stroke="${strokeColor}" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+                             <path d="${chartPath} V 40 H 0 Z" fill="${strokeColor}" fill-opacity="0.1" stroke="none"></path>
+                        </svg>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderTable() {
+            const data = displayedData;
+            const tbody = document.getElementById('crypto-table-body');
+            tbody.innerHTML = data.map((item, index) => {
+                const change24h = item.price_change_percentage_24h || 0;
+                const sparklinePath = generateSparklinePath(item.sparkline_in_7d.price);
+                const isPositive = change24h >= 0;
+                const strokeColor = isPositive ? '#34d399' : '#f87171';
+
+                return `
+                <tr class="hover:bg-white/5 transition-colors border-b border-white/5 group">
+                    <td class="py-4 px-4 text-center text-neutral-500 text-xs"><span class="iconify inline mr-1 opacity-50" data-icon="lucide:star" data-width="10"></span> ${(index + 1).toString().padStart(2, '0')}</td>
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image}" alt="${item.name}" class="w-6 h-6 rounded-full grayscale group-hover:grayscale-0 transition-all">
+                            <span class="text-white group-hover:text-indigo-300 transition-colors font-medium">${item.name} <span class="text-neutral-500 text-[10px] ml-1">[${item.symbol.toUpperCase()}]</span></span>
+                        </div>
+                    </td>
+                    <td id="price-${item.id}" class="py-4 px-4 text-white font-mono transition-colors duration-300">${formatCurrency(item.current_price)}</td>
+                    <td class="py-4 px-4 font-mono ${change24h >= 0 ? 'text-emerald-400' : 'text-red-400'}">${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%</td>
+                    <td class="py-4 px-4 font-mono text-neutral-400">${formatCompactNumber(item.market_cap)}</td>
+                    <td class="py-4 px-4 font-mono text-neutral-400">${formatCompactNumber(item.total_volume)}</td>
+                    <td class="py-4 px-4">
+                        <svg width="100" height="24" class="opacity-80" stroke-width="1.5">
+                            <path d="${sparklinePath}" stroke="${strokeColor}" fill="none"></path>
+                        </svg>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-500/10', 'text-indigo-400', 'border-indigo-500/20');
+                btn.classList.add('text-neutral-400');
+            });
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.classList.add('active', 'bg-indigo-500/10', 'text-indigo-400', 'border-indigo-500/20');
+            activeBtn.classList.remove('text-neutral-400');
+            updateUI();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            setInterval(fetchData, 60000);
+            startLiveSimulation();
+            document.getElementById('tab-trending').classList.add('bg-indigo-500/10', 'text-indigo-400', 'border-indigo-500/20');
+            document.getElementById('tab-trending').classList.remove('text-neutral-400');
+        });
+
+        // Interactive Starfield Background (mouse repulsion + twinkle)
+        const canvasContainer = document.getElementById('canvas-container');
+
+        // Scene Setup
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.03); // Increased fog for depth
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 10; 
+        camera.position.y = 0;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 1); // Explicit solid black clear color
+        canvasContainer.appendChild(renderer.domElement);
+
+        // --- PARAMETERS ---
+        const params = {
+            count: 5000, 
+            speed: 0.15,
+            repulsionStrength: 3.5,
+        };
+
+        // --- SHADERS ---
+        const vertexShader = `
+            uniform float uTime;
+            uniform float uPixelRatio;
+            uniform float uSize;
+            uniform vec3 uMouse;
+            uniform float uRepulsionStrength;
+            
+            attribute float aScale;
+            attribute vec3 aRandomness;
+            
+            varying float vAlpha;
+
+            void main() {
+                vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                
+                // Subtle floating movement
+                float time = uTime * 0.5;
+                modelPosition.x += sin(time * aRandomness.x) * 0.2;
+                modelPosition.y += cos(time * aRandomness.y) * 0.2;
+                modelPosition.z += sin(time * aRandomness.z) * 0.2;
+
+                // Mouse Repulsion Logic
+                float dist = distance(modelPosition.xy, uMouse.xy);
+                float radius = 5.0; // Radius of influence
+                
+                if(dist < radius) {
+                    vec3 dir = normalize(modelPosition.xyz - vec3(uMouse.x, uMouse.y, 0.0));
+                    float force = (1.0 - dist / radius);
+                    force = pow(force, 2.0) * uRepulsionStrength;
+                    
+                    // Push stars away
+                    modelPosition.x += dir.x * force;
+                    modelPosition.y += dir.y * force;
+                    modelPosition.z += dir.z * force * 0.5;
+                }
+
+                vec4 viewPosition = viewMatrix * modelPosition;
+                vec4 projectedPosition = projectionMatrix * viewPosition;
+                
+                gl_Position = projectedPosition;
+
+                // Size attenuation
+                // Scale is now 0-1, uSize controls base pixel size
+                gl_PointSize = uSize * aScale * uPixelRatio;
+                gl_PointSize *= (1.0 / -viewPosition.z); // Perspective division
+
+                // Twinkle effect
+                vAlpha = 0.5 + 0.5 * sin(uTime * 2.0 + aRandomness.x * 100.0);
+            }
+        `;
+
+        const fragmentShader = `
+            varying float vAlpha;
+
+            void main() {
+                // Distance from center of the point (0.0 to 0.5)
+                float d = distance(gl_PointCoord, vec2(0.5));
+                
+                // Discard outside circle
+                if (d > 0.5) discard;
+
+                // Create a soft glow effect
+                // Center is bright, edges fade
+                float strength = 1.0 - (d * 2.0);
+                strength = pow(strength, 2.0); // Make the falloff sharper
+
+                vec3 color = vec3(1.0); // White stars
+
+                gl_FragColor = vec4(color, strength * vAlpha);
+            }
+        `;
+
+        // --- GEOMETRY ---
+        const generateStars = () => {
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(params.count * 3);
+            const scales = new Float32Array(params.count);
+            const randomness = new Float32Array(params.count * 3);
+
+            for(let i = 0; i < params.count; i++) {
+                const i3 = i * 3;
+
+                // Spread stars in a wide volume
+                positions[i3] = (Math.random() - 0.5) * 40;     
+                positions[i3 + 1] = (Math.random() - 0.5) * 25; 
+                positions[i3 + 2] = (Math.random() - 0.5) * 25; 
+
+                // Scale: Random size for variety
+                scales[i] = Math.random(); 
+
+                randomness[i3] = Math.random();
+                randomness[i3+1] = Math.random();
+                randomness[i3+2] = Math.random();
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
+            geometry.setAttribute('aRandomness', new THREE.BufferAttribute(randomness, 3));
+
+            return geometry;
+        };
+
+        const geometry = generateStars();
+
+        const material = new THREE.ShaderMaterial({
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: false,
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: {
+                uTime: { value: 0 },
+                uPixelRatio: { value: renderer.getPixelRatio() },
+                uSize: { value: 70.0 }, // Drastically reduced size
+                uMouse: { value: new THREE.Vector3(9999, 9999, 9999) },
+                uRepulsionStrength: { value: params.repulsionStrength }
+            },
+            transparent: true
+        });
+
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        // --- INTERACTION ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0); 
+        const target = new THREE.Vector3();
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            raycaster.ray.intersectPlane(plane, target);
+            
+            if(target) {
+                material.uniforms.uMouse.value.copy(target);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
+        });
+
+        // --- ANIMATION ---
+        const clock = new THREE.Clock();
+
+        const animate = () => {
+            const elapsedTime = clock.getElapsedTime();
+
+            material.uniforms.uTime.value = elapsedTime * params.speed;
+
+            // Slow rotation
+            points.rotation.y = elapsedTime * 0.02;
+            points.rotation.z = elapsedTime * 0.003;
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+    </script>
+
+</body></html>
+
+
