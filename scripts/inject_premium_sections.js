@@ -141,19 +141,19 @@ const match = htmlContent.match(pagesRegex);
 
 if (match) {
     let decodedHtml = Buffer.from(match[2], 'base64').toString('utf8');
-    
+
     // Inject Section 1 before Advanced Interface Section
     decodedHtml = decodedHtml.replace('<!-- Advanced Interface Section -->', section1Str + '\\n        <!-- Advanced Interface Section -->');
-    
+
     // Inject Section 2 before Live Feed Section
     decodedHtml = decodedHtml.replace('<!-- Live Feed Section -->', section2Str + '\\n        <!-- Live Feed Section -->');
-    
+
     // Inject Section 3 to replace Trust Grid and end before CTA/Footer
     const trustGridRegex = /<!-- Trust Grid -->[\s\S]*?<!-- CTA \/ Footer -->/;
     decodedHtml = decodedHtml.replace(trustGridRegex, section3Str + '\\n        <!-- CTA / Footer -->');
 
     let newBase64Str = Buffer.from(decodedHtml, 'utf8').toString('base64');
-    
+
     htmlContent = htmlContent.replace(match[0], `home: "${newBase64Str}"`);
     fs.writeFileSync('index.html', htmlContent, 'utf8');
     console.log('Successfully injected 3 premium sections into the Home page payload.');
